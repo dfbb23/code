@@ -1,0 +1,71 @@
+#include <unistd.h>
+#include <stdlib.h>
+
+// دالة لطباعة رسالة خطأ والخروج من البرنامج
+void	ft_error(void)
+{	
+	write(2, "Error\n", 6);
+	exit(1);
+}
+
+// دالة تتحقق مما إذا كان الحرف غير رقمي (أي غير مسموح به)
+int	ft_isnotdigit(int c)
+{
+	if ((c < '0' || c > '9') && c != '+' && c != '-'
+		&& c != ' ' && c != '\t') // السماح بالمسافات والتبويبات
+		return (1);
+	return (0);
+}
+
+// دالة تتحقق مما إذا كان الحرف علامة (+ أو -)
+int	sign(int c)
+{
+	return (c == '+' || c == '-');
+}
+
+// دالة تتحقق مما إذا كان الحرف رقمًا (0-9)
+int	digit(int c)
+{
+	return (c >= '0' && c <= '9');
+}
+
+// دالة تتحقق مما إذا كان الحرف مسافة
+int	space(int c)
+{
+	return (c == ' ' || c == '\t');
+}
+
+// دالة للتحقق من صحة مدخلات المستخدم
+void	check_error(char **argv)
+{
+	int i, j;
+
+	i = 1; // البدء من 1 لتجنب فحص اسم البرنامج
+	while (argv[i])
+	{
+		j = 0;
+		while (argv[i][j] != '\0')
+		{
+			if (ft_isnotdigit(argv[i][j])) // التحقق من وجود أحرف غير مسموح بها
+				ft_error();
+			if (sign(argv[i][j])) // التعامل مع + أو -
+			{
+				if (j != 0 && !space(argv[i][j - 1])) // يجب أن يكون + أو - في البداية أو بعد مسافة
+					ft_error();
+				j++;
+				if (!digit(argv[i][j])) // يجب أن يتبع العلامة رقم
+					ft_error();
+			}
+			else if (digit(argv[i][j])) // التعامل مع الأرقام
+			{
+				j++;
+				if (argv[i][j] == '\0')
+					break ;
+				if (!digit(argv[i][j]) && !space(argv[i][j])) // يجب أن يكون الحرف التالي رقمًا أو مسافة
+					ft_error();
+			}
+			j++;
+		}
+		i++;
+	}
+}
